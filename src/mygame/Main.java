@@ -10,6 +10,8 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * test
@@ -17,8 +19,24 @@ import com.jme3.scene.Spatial;
  */
 public class Main extends SimpleApplication {
     
+    // Constants
+    // Model moving boundaries
+    static float X_OFFSET_MIN = -3.0f, X_OFFSET_MAX = 3.0f;
+    static float Y_OFFSET_MIN = -0.5f, Y_OFFSET_MAX = 0.5f;
+    static float Z_OFFSET_MIN = 1.0f, Z_OFFSET_MAX = 6.0f;
+    // Velocity boundaries
+    static float VELOCITY_MIN = 0.0f, VELOCITY_MAX = 2.0f;
+    
+    // Models to use
     String[] environment_model_names = {"room.j3o"};
     String[] model_names = {"cat.j3o", "cat2.j3o"};
+    
+    // Model positions and velocities
+    ArrayList<Vector3f> positions;
+    ArrayList<Vector3f> velocities;
+    
+    // Random generator
+    Random rn;
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -43,7 +61,7 @@ public class Main extends SimpleApplication {
         // Setup models
         for (String model_name : model_names) {
             Spatial model = assetManager.loadModel("Models-High/" + model_name);
-            model = model.center();
+            model.setLocalTranslation(0.0f, 0.0f, -3.0f);
             // Attach the model to the root node
             rootNode.attachChild(model);
         }
@@ -69,6 +87,16 @@ public class Main extends SimpleApplication {
         cam.setFrustumPerspective(45.0f, this.settings.getWidth() / (float)this.settings.getHeight(), 0.1f, 100000.0f);
         cam.setLocation(new Vector3f(0.0f, 0.0f, 0.0f));
         cam.lookAt(new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f));
+        
+        // Setup positions
+        positions = new ArrayList<>();
+        for (String model_name : model_names) {
+            Vector3f position = new Vector3f();
+            position.x = X_OFFSET_MIN + (X_OFFSET_MAX - X_OFFSET_MIN) * rn.nextFloat();
+            position.y = Y_OFFSET_MIN + (Y_OFFSET_MAX - Y_OFFSET_MIN) * rn.nextFloat();
+            position.z = Z_OFFSET_MIN + (Z_OFFSET_MAX - Z_OFFSET_MIN) * rn.nextFloat();
+            positions.add(position);
+        }
     }
 
     @Override
