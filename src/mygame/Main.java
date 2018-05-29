@@ -23,13 +23,14 @@ public class Main extends SimpleApplication {
     // Model moving boundaries
     static float X_OFFSET_MIN = -3.0f, X_OFFSET_MAX = 3.0f;
     static float Y_OFFSET_MIN = -0.5f, Y_OFFSET_MAX = 0.5f;
-    static float Z_OFFSET_MIN = 1.0f, Z_OFFSET_MAX = 6.0f;
+    static float Z_OFFSET_MIN = -6.0f, Z_OFFSET_MAX = -1.0f;
     // Velocity boundaries
     static float VELOCITY_MIN = 0.0f, VELOCITY_MAX = 2.0f;
     
     // Models to use
     String[] environment_model_names = {"room.j3o"};
     String[] model_names = {"cat.j3o", "cat2.j3o"};
+    ArrayList<Spatial> models;
     
     // Model positions and velocities
     ArrayList<Vector3f> positions;
@@ -58,12 +59,28 @@ public class Main extends SimpleApplication {
             rootNode.attachChild(model);
         }
         
-        // Setup models
+        // Initialize the random generator
+        rn = new Random();
+        
+        // Setup 
+        models = new ArrayList<>();
+        positions = new ArrayList<>();
         for (String model_name : model_names) {
             Spatial model = assetManager.loadModel("Models-High/" + model_name);
-            model.setLocalTranslation(0.0f, 0.0f, -3.0f);
+            
+            // Initialize position
+            Vector3f position = new Vector3f();
+            position.x = X_OFFSET_MIN + (X_OFFSET_MAX - X_OFFSET_MIN) * rn.nextFloat();
+            position.y = Y_OFFSET_MIN + (Y_OFFSET_MAX - Y_OFFSET_MIN) * rn.nextFloat();
+            position.z = Z_OFFSET_MIN + (Z_OFFSET_MAX - Z_OFFSET_MIN) * rn.nextFloat();
+            positions.add(position);
+            model.setLocalTranslation(position);
+            
             // Attach the model to the root node
             rootNode.attachChild(model);
+            
+            // Attach the model to the model array list
+            models.add(model);
         }
         
         // Setup light sources
@@ -88,24 +105,46 @@ public class Main extends SimpleApplication {
         cam.setLocation(new Vector3f(0.0f, 0.0f, 0.0f));
         cam.lookAt(new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f));
         
-        // Setup positions
-        positions = new ArrayList<>();
-        for (String model_name : model_names) {
-            Vector3f position = new Vector3f();
-            position.x = X_OFFSET_MIN + (X_OFFSET_MAX - X_OFFSET_MIN) * rn.nextFloat();
-            position.y = Y_OFFSET_MIN + (Y_OFFSET_MAX - Y_OFFSET_MIN) * rn.nextFloat();
-            position.z = Z_OFFSET_MIN + (Z_OFFSET_MAX - Z_OFFSET_MIN) * rn.nextFloat();
-            positions.add(position);
+        // Initialize velocities
+        velocities = new ArrayList<>();
+        for (int i = 0; i < model_names.length; i++) {
+            velocities.add(generateNewVelocity());
         }
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        //TODO: add update code
+        // Update positions
+        for (int i = 0; i < model_names.length; i++) {
+            Vector3f new_position = positions.get(i).add(velocities.get(i).mult(tpf));
+            if (isOutOfBoundaries(new_position)) { // If the next-frame position is out of boundaries
+                velocities.set(i, generateNewVelocity());
+                new_position = positions.get(i);
+            }
+            
+            positions.set(i, new_position);
+            models.get(i).setLocalTranslation(new_position);
+        }
     }
 
     @Override
     public void simpleRender(RenderManager rm) {
         //TODO: add render code
+    }
+    
+    private boolean isOutOfBoundaries(Vector3f position) {
+        return !(position.x >= X_OFFSET_MIN && position.x <= X_OFFSET_MAX
+                && position.y >= Y_OFFSET_MIN && position.y <= Y_OFFSET_MAX
+                && position.z >= Z_OFFSET_MIN && position.z <= Z_OFFSET_MAX);
+    }
+    
+    private Vector3f generateNewVelocity() {
+        Vector3f velocity = new Vector3f();
+        velocity.x = rn.nextFloat();
+        velocity.y = rn.nextFloat();
+        velocity.z = rn.nextFloat();
+        velocity = velocity.normalize();
+        velocity = velocity.mult(VELOCITY_MIN + rn.nextFloat() * (VELOCITY_MAX - VELOCITY_MIN));
+        return velocity;
     }
 }
