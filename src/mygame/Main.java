@@ -140,9 +140,9 @@ public class Main extends SimpleApplication {
     
     private Vector3f generateNewVelocity() {
         Vector3f velocity = new Vector3f();
-        velocity.x = rn.nextFloat();
-        velocity.y = rn.nextFloat();
-        velocity.z = rn.nextFloat();
+        velocity.x = rn.nextFloat() * 2 -1;
+        velocity.y = rn.nextFloat() * 2 -1;
+        velocity.z = rn.nextFloat() * 2 -1;
         velocity = velocity.normalize();
         velocity = velocity.mult(VELOCITY_MIN + rn.nextFloat() * (VELOCITY_MAX - VELOCITY_MIN));
         return velocity;
