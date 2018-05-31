@@ -19,27 +19,35 @@ import com.jme3.texture.Image;
 import com.jme3.util.BufferUtils;
 import com.jme3.util.Screenshots;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import javax.imageio.ImageIO;
 
 /**
  *
  * @author sunlu
  */
-public class FrameSaver implements SceneProcessor, AppState {
+public class FrameSaver implements SceneProcessor {
     
     ByteBuffer byteBuffer;
     BufferedImage rawFrame;
     RenderManager renderManager;
+    boolean is_round2;
     
     boolean isInitialized = false;
+    
+    public FrameSaver(boolean is_round2) {
+        this.is_round2 = is_round2;
+    }
 
     @Override
     public void initialize(RenderManager rm, ViewPort vp) {
         Camera camera = vp.getCamera();
         int width = camera.getWidth();
         int height = camera.getHeight();
-        byteBuffer = BufferUtils.createByteBuffer(width * height * 3);
-        rawFrame = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        byteBuffer = BufferUtils.createByteBuffer(width * height * 4);
+        rawFrame = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
         renderManager = rm;
         
         isInitialized = true;
@@ -61,9 +69,16 @@ public class FrameSaver implements SceneProcessor, AppState {
 
     @Override
     public void postFrame(FrameBuffer out) {
-        byteBuffer.clear();
-        renderManager.getRenderer().readFrameBufferWithFormat(out, byteBuffer, Image.Format.BGR8);
-        Screenshots.convertScreenShot(byteBuffer, rawFrame);
+        if (is_round2) {
+            byteBuffer.clear();
+            renderManager.getRenderer().readFrameBufferWithFormat(out, byteBuffer, Image.Format.BGRA8);
+            Screenshots.convertScreenShot(byteBuffer, rawFrame);
+            try {
+                ImageIO.write(rawFrame, "png", new File("frame42.png"));
+            } catch (IOException e) {
+                System.err.println("Caught IOException: " + e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -71,35 +86,5 @@ public class FrameSaver implements SceneProcessor, AppState {
 
     @Override
     public void setProfiler(AppProfiler profiler) {}
-
-    @Override
-    public void initialize(AppStateManager stateManager, Application app) {
-        isInitialized = true;
-    }
-
-    @Override
-    public void setEnabled(boolean active) {}
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
-    @Override
-    public void stateAttached(AppStateManager stateManager) {}
-
-    @Override
-    public void stateDetached(AppStateManager stateManager) {}
-
-    @Override
-    public void update(float tpf) {}
-
-    @Override
-    public void render(RenderManager rm) {}
-
-    @Override
-    public void postRender() {}
-    
-    
     
 }

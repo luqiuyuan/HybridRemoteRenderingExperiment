@@ -111,6 +111,10 @@ public class Main extends SimpleApplication {
         for (int i = 0; i < model_names.length; i++) {
             velocities.add(generateNewVelocity());
         }
+        
+        // Attch renderer
+        attachRenderer(false);
+        attachRenderer(true);
     }
 
     @Override
@@ -149,8 +153,8 @@ public class Main extends SimpleApplication {
         return velocity;
     }
     
-    private void attachRenderer(boolean is_round2, Camera camera) {
-        FrameSaver frame_saver = new FrameSaver();
+    private void attachRenderer(boolean is_round2) {
+        FrameSaver frame_saver = new FrameSaver(is_round2);
         ViewPort view_port;
         if (is_round2) {
             view_port = renderManager.createPostView("round 2", cam);
@@ -165,7 +169,6 @@ public class Main extends SimpleApplication {
         for (Spatial s : viewPort.getScenes()) {
             view_port.attachScene(s);
         }
-        stateManager.attach(frame_saver);
         view_port.addProcessor(frame_saver);
     }
 }
