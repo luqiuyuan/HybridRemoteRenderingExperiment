@@ -31,6 +31,8 @@ public class Main extends SimpleApplication {
     // Models to use
     String[] environment_model_names = {"room.j3o"};
     String[] model_names = {"cat.j3o", "cat2.j3o"};
+    boolean is_environment_high_fidelity = false;
+    boolean[] is_high_fidelity = {true, false};
     ArrayList<Spatial> models;
     
     // Model positions and velocities
@@ -42,32 +44,40 @@ public class Main extends SimpleApplication {
 
     public static void main(String[] args) {
         Main app = new Main();
+        app.setDisplayStatView(false);
         app.start();
     }
 
     @Override
     public void simpleInitApp() {
         // Setup environment models
-        for (String environment_model_name : environment_model_names) {
-            Spatial model = assetManager.loadModel("Models-High/" + environment_model_name);
-            // Set materials
-            Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-            material.setColor("Diffuse", ColorRGBA.Green);
-            model.setMaterial(material);
-            model.setLocalTranslation(-10.0f, -10.0f, 30.0f);
-            model = model.scale(60.0f);
-            // Attach the environment model to the root node
-            rootNode.attachChild(model);
+        if (is_environment_high_fidelity) {
+            for (String environment_model_name : environment_model_names) {
+                Spatial model = assetManager.loadModel("Models-High/" + environment_model_name);
+                // Set materials
+                Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+                material.setColor("Diffuse", ColorRGBA.Green);
+                model.setMaterial(material);
+                model.setLocalTranslation(-10.0f, -10.0f, 30.0f);
+                model = model.scale(60.0f);
+                // Attach the environment model to the root node
+                rootNode.attachChild(model);
+            }
         }
         
         // Initialize the random generator
         rn = new Random();
         
-        // Setup 
+        // Setup high-fidelity models
         models = new ArrayList<>();
         positions = new ArrayList<>();
-        for (String model_name : model_names) {
-            Spatial model = assetManager.loadModel("Models-High/" + model_name);
+        for (int i = 0; i < model_names.length; i++) {
+            Spatial model;
+            if (is_high_fidelity[i]) {
+                model = assetManager.loadModel("Models-High/" + model_names[i]);
+            } else {
+                model = assetManager.loadModel("Models-Low/" + model_names[i]);
+            }
             
             // Initialize position
             Vector3f position = new Vector3f();
@@ -154,7 +164,7 @@ public class Main extends SimpleApplication {
     }
     
     private void attachRenderer(boolean is_round2) {
-        FrameSaver frame_saver = new FrameSaver(is_round2);
+        FrameSaver frame_saver = new FrameSaver(is_round2, models, is_high_fidelity);
         ViewPort view_port;
         if (is_round2) {
             view_port = renderManager.createPostView("round 2", cam);
