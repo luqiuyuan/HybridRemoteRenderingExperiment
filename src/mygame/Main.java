@@ -7,8 +7,8 @@ import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.RenderManager;
-import com.jme3.scene.Geometry;
+import com.jme3.renderer.Camera;
+import com.jme3.renderer.RenderManager;;
 import com.jme3.scene.Spatial;
 import java.util.ArrayList;
 import java.util.Random;
@@ -146,5 +146,9 @@ public class Main extends SimpleApplication {
         velocity = velocity.normalize();
         velocity = velocity.mult(VELOCITY_MIN + rn.nextFloat() * (VELOCITY_MAX - VELOCITY_MIN));
         return velocity;
+    }
+    
+    private void attachRenderer(boolean is_round2, Camera camera) {
+        FrameSaver
     }
 }
