@@ -8,7 +8,8 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.renderer.RenderManager;;
+import com.jme3.renderer.RenderManager;import com.jme3.renderer.ViewPort;
+;
 import com.jme3.scene.Spatial;
 import java.util.ArrayList;
 import java.util.Random;
@@ -149,6 +150,22 @@ public class Main extends SimpleApplication {
     }
     
     private void attachRenderer(boolean is_round2, Camera camera) {
-        FrameSaver
+        FrameSaver frame_saver = new FrameSaver();
+        ViewPort view_port;
+        if (is_round2) {
+            view_port = renderManager.createPostView("round 2", cam);
+            view_port.setClearFlags(true, false, false);
+        } else {
+            view_port = renderManager.createPostView("round 1", cam);
+            view_port.setClearFlags(true, true, true);
+        }
+        for (Spatial s : guiViewPort.getScenes()) {
+            view_port.attachScene(s);
+        }
+        for (Spatial s : viewPort.getScenes()) {
+            view_port.attachScene(s);
+        }
+        stateManager.attach(frame_saver);
+        view_port.addProcessor(frame_saver);
     }
 }

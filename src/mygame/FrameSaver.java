@@ -10,10 +10,16 @@ import com.jme3.app.state.AppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.post.SceneProcessor;
 import com.jme3.profile.AppProfiler;
+import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.texture.FrameBuffer;
+import com.jme3.texture.Image;
+import com.jme3.util.BufferUtils;
+import com.jme3.util.Screenshots;
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
 
 /**
  *
@@ -21,10 +27,21 @@ import com.jme3.texture.FrameBuffer;
  */
 public class FrameSaver implements SceneProcessor, AppState {
     
+    ByteBuffer byteBuffer;
+    BufferedImage rawFrame;
+    RenderManager renderManager;
+    
     boolean isInitialized = false;
 
     @Override
     public void initialize(RenderManager rm, ViewPort vp) {
+        Camera camera = vp.getCamera();
+        int width = camera.getWidth();
+        int height = camera.getHeight();
+        byteBuffer = BufferUtils.createByteBuffer(width * height * 3);
+        rawFrame = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        renderManager = rm;
+        
         isInitialized = true;
     }
 
@@ -43,7 +60,11 @@ public class FrameSaver implements SceneProcessor, AppState {
     public void postQueue(RenderQueue rq) {}
 
     @Override
-    public void postFrame(FrameBuffer out) {}
+    public void postFrame(FrameBuffer out) {
+        byteBuffer.clear();
+        renderManager.getRenderer().readFrameBufferWithFormat(out, byteBuffer, Image.Format.BGR8);
+        Screenshots.convertScreenShot(byteBuffer, rawFrame);
+    }
 
     @Override
     public void cleanup() {}
