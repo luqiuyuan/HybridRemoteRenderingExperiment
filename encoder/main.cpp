@@ -7,7 +7,7 @@ using namespace cv;
 using namespace std;
 
 int main() {
-  const int NUM_FRAMES = 1000;
+  const int NUM_FRAMES = 100;
   
   vector<Mat> images;
   for (int i = 1; i <= NUM_FRAMES; i++) {
@@ -38,6 +38,12 @@ int main() {
 		return 1;
 	} else if(initialization_flag > 0)
 		cerr<<"Warning: main.cpp: Video encoder initialization warning with warning code: "<<initialization_flag<<endl;
+  
+  for (vector<Mat>::iterator it = images.begin(); it != images.end(); ++it) {
+    encoder.write(*it);
+  }
+
+  encoder.flush_close();
 
   return 0;
 }
