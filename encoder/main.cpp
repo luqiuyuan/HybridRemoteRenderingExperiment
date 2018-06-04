@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
+#include <ctime>
 
 using namespace cv;
 using namespace std;
@@ -39,9 +40,12 @@ int main() {
 	} else if(initialization_flag > 0)
 		cerr<<"Warning: main.cpp: Video encoder initialization warning with warning code: "<<initialization_flag<<endl;
   
+  const clock_t begin_time = clock();
   for (vector<Mat>::iterator it = images.begin(); it != images.end(); ++it) {
     encoder.write(*it);
   }
+  const clock_t end_time = clock();
+  cout << "It takes " << float( end_time - begin_time ) /  CLOCKS_PER_SEC << " seconds to encode." << endl;
 
   encoder.flush_close();
 

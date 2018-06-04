@@ -4,9 +4,9 @@ uint8_t VideoEncoder::ENDCODE[] = {0, 0, 1, 0xb7};
 
 string VideoEncoder::DEFAULT_H264_PRESET = "medium";
 
-string VideoEncoder::DEFAULT_H264_QP = "0";
+string VideoEncoder::DEFAULT_H264_QP = "24";
 
-string VideoEncoder::DEFAULT_H264_PROFILE = "high444";
+string VideoEncoder::DEFAULT_H264_PROFILE = "main";
 
 VideoEncoder::VideoEncoder(string filepath, Size resolution, int video_codec): resolution(resolution), video_codec(video_codec), c(NULL), frameN(-1), disable_bitrate_control(false), initialization_flag(0), h264_profile(DEFAULT_H264_PROFILE), h264_preset(DEFAULT_H264_PRESET), b_frame(DEFAULT_B_FRAME), size_gop(DEFAULT_SIZE_GOP), fps(DEFAULT_FPS), h264_qp(DEFAULT_H264_QP), bitrate(DEFAULT_BITRATE) {
 	output = fopen(filepath.c_str(), "wb");
@@ -65,7 +65,7 @@ void VideoEncoder::init() {
      */
     c->gop_size = size_gop;
     c->max_b_frames = b_frame;
-    c->pix_fmt = AV_PIX_FMT_YUV444P;    // use AV_PIX_FMT_YUV444P to facilitate data transfer from cv::Mat
+    c->pix_fmt = AV_PIX_FMT_YUV420P;    // use AV_PIX_FMT_YUV444P to facilitate data transfer from cv::Mat
 
     if (video_codec_id == AV_CODEC_ID_H264) {
         av_opt_set(c->priv_data, "profile", h264_profile.c_str(), 0);
