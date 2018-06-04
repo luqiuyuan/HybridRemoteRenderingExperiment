@@ -39,13 +39,17 @@ public class FrameSaver implements SceneProcessor {
     int index = 0;
     ArrayList<Spatial> models;
     boolean[] is_high_fidelity;
+    boolean pure_remote_mode;
+    boolean write_to_files;
     
     boolean isInitialized = false;
     
-    public FrameSaver(boolean is_round2, ArrayList<Spatial> models, boolean[] is_high_fidelity) {
+    public FrameSaver(boolean is_round2, ArrayList<Spatial> models, boolean[] is_high_fidelity, boolean pure_remote_mode, boolean write_to_files) {
         this.is_round2 = is_round2;
         this.models = models;
         this.is_high_fidelity = is_high_fidelity;
+        this.pure_remote_mode = pure_remote_mode;
+        this.write_to_files = write_to_files;
     }
 
     @Override
@@ -70,10 +74,12 @@ public class FrameSaver implements SceneProcessor {
 
     @Override
     public void preFrame(float tpf) {
-        if (is_round2)
-            prepareScene(true);
-        else
-            prepareScene(false);
+        if (!pure_remote_mode && write_to_files) {
+            if (is_round2)
+                prepareScene(true);
+            else
+                prepareScene(false);
+        }
     }
 
     @Override
@@ -81,7 +87,7 @@ public class FrameSaver implements SceneProcessor {
 
     @Override
     public void postFrame(FrameBuffer out) {
-        if (is_round2) {
+        if (is_round2 && write_to_files) {
             byteBuffer.clear();
             renderManager.getRenderer().readFrameBufferWithFormat(out, byteBuffer, Image.Format.BGRA8);
             Screenshots.convertScreenShot(byteBuffer, rawFrame);
