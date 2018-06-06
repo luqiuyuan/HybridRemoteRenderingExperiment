@@ -11,6 +11,7 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;import com.jme3.renderer.ViewPort;
 ;
 import com.jme3.scene.Spatial;
+import com.jme3.system.AppSettings;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +49,11 @@ public class Main extends SimpleApplication {
     Random rn;
 
     public static void main(String[] args) {
+        AppSettings settings = new AppSettings(true);
+        settings.setResolution(1440, 900);
+  
         Main app = new Main();
+        app.setSettings(settings);
         app.setDisplayStatView(false);
         app.start();
     }
