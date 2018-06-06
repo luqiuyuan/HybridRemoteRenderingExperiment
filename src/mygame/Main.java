@@ -47,6 +47,9 @@ public class Main extends SimpleApplication {
     
     // Random generator
     Random rn;
+    
+    FrameSaver frame_saver1;
+    FrameSaver frame_saver2;
 
     public static void main(String[] args) {
         AppSettings settings = new AppSettings(true);
@@ -137,10 +140,10 @@ public class Main extends SimpleApplication {
         
         // Attch renderer
         if (pure_remote_mode) {
-            attachRenderer(true, true);
+            frame_saver1 = attachRenderer(true, true);
         } else {
-            attachRenderer(false, false);
-            attachRenderer(true, false);
+            frame_saver1 = attachRenderer(false, false);
+            frame_saver2 = attachRenderer(true, false);
         }
     }
 
@@ -166,11 +169,15 @@ public class Main extends SimpleApplication {
         
         // Frame index update
         frameIndex++;
-        if (frameIndex == 10000) {
+        int number_of_frames = 1000;
+        if (frameIndex == number_of_frames) {
             Date date = new Date();
             endTime = date.getTime();
             double duration = (endTime - startTime) / (double)1000;
-            System.out.println("Rendering 10000 frames takes: " + duration + " seconds.");
+            System.out.println("Rendering " + number_of_frames + " frames takes: " + duration + " seconds.");
+        }
+        if (write_to_files && (frameIndex == number_of_frames + 1)) {
+            frame_saver2.pause();
         }
     }
 
@@ -195,7 +202,7 @@ public class Main extends SimpleApplication {
         return velocity;
     }
     
-    private void attachRenderer(boolean is_round2, boolean pure_remote_mode) {
+    private FrameSaver attachRenderer(boolean is_round2, boolean pure_remote_mode) {
         FrameSaver frame_saver = new FrameSaver(is_round2, models, is_high_fidelity, pure_remote_mode, write_to_files);
         ViewPort view_port;
         if (is_round2) {
@@ -212,5 +219,7 @@ public class Main extends SimpleApplication {
             view_port.attachScene(s);
         }
         view_port.addProcessor(frame_saver);
+        
+        return frame_saver;
     }
 }

@@ -41,6 +41,7 @@ public class FrameSaver implements SceneProcessor {
     boolean[] is_high_fidelity;
     boolean pure_remote_mode;
     boolean write_to_files;
+    boolean paused = false;
     
     boolean isInitialized = false;
     
@@ -87,7 +88,7 @@ public class FrameSaver implements SceneProcessor {
 
     @Override
     public void postFrame(FrameBuffer out) {
-        if (is_round2 && write_to_files) {
+        if (is_round2 && write_to_files && !paused) {
             byteBuffer.clear();
             renderManager.getRenderer().readFrameBufferWithFormat(out, byteBuffer, Image.Format.BGRA8);
             Screenshots.convertScreenShot(byteBuffer, rawFrame);
@@ -118,6 +119,10 @@ public class FrameSaver implements SceneProcessor {
                 else
                     models.get(i).setCullHint(Spatial.CullHint.Always);
         }
+    }
+    
+    void pause() {
+        paused = true;
     }
     
 }
