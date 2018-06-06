@@ -50,7 +50,7 @@ public class Main extends SimpleApplication {
 
     public static void main(String[] args) {
         AppSettings settings = new AppSettings(true);
-        settings.setResolution(1440, 900);
+        settings.setResolution(640, 480);
   
         Main app = new Main();
         app.setSettings(settings);
@@ -166,7 +166,7 @@ public class Main extends SimpleApplication {
         
         // Frame index update
         frameIndex++;
-        if (frameIndex == 1000) {
+        if (frameIndex == 10000) {
             Date date = new Date();
             endTime = date.getTime();
             double duration = (endTime - startTime) / (double)1000;
